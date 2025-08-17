@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -21,4 +22,15 @@ public class Member {
     private String password;
     private MemberRole role;
 
+    public Member(String email, String name, String password, MemberRole role) {
+        this.email = email;
+        this.name = name;
+        this.password = password;
+        this.role = role;
+    }
+
+    public void updateMember(String email, MemberRole role) {
+        this.email = email;
+        this.role = role;
+    }
 }
