@@ -4,10 +4,16 @@ import com.mete0rfish.campusjob.domain.company.Company;
 import com.mete0rfish.campusjob.domain.member.Member;
 import com.mete0rfish.campusjob.support.converter.StringListConverter;
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.util.List;
 
 @Entity
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Review {
 
     @Id
@@ -27,4 +33,11 @@ public class Review {
     private Integer age;
     private String seekPeriod;
     private String tip;
+
+    public void update(List<String> certificates, Integer age, String seekPeriod, String tip) {
+        this.certificates = certificates;
+        this.age = age;
+        this.seekPeriod = seekPeriod;
+        this.tip = tip;
+    }
 }
