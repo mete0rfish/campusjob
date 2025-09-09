@@ -3,6 +3,8 @@ package com.mete0rfish.campusjob.domain.member;
 import com.mete0rfish.campusjob.domain.member.dto.LoginJoinRequest;
 import com.mete0rfish.campusjob.domain.member.dto.LoginRequest;
 import com.mete0rfish.campusjob.domain.member.dto.MemberResponse;
+import com.mete0rfish.campusjob.support.exception.CustomException;
+import com.mete0rfish.campusjob.support.exception.ErrorCode;
 import com.mete0rfish.campusjob.support.member.MemberRole;
 import com.mete0rfish.campusjob.support.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +33,8 @@ public class MemberLoginService {
     }
 
     public String login(LoginRequest request) {
-        Member member = memberRepository.findByEmail(request.email());
+        Member member = memberRepository.findByEmail(request.email())
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
         if(!passwordEncoder.matches(request.password(), member.getPassword())) {
             // TODO 커스텀 예외처리
             throw new RuntimeException("비밀번호가 일치하지 않습니다.");
