@@ -1,7 +1,7 @@
 package com.mete0rfish.campusjob.support.data;
 
+import com.mete0rfish.campusjob.domain.member.Member;
 import com.mete0rfish.campusjob.domain.member.MemberRepository;
-import com.mete0rfish.campusjob.domain.review.Review;
 import com.mete0rfish.campusjob.domain.review.ReviewRepository;
 import com.mete0rfish.campusjob.support.data.producer.MemberProducer;
 import com.mete0rfish.campusjob.support.data.producer.ReviewProducer;
@@ -9,8 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @RequiredArgsConstructor
 @Component
@@ -25,7 +23,8 @@ public class TestDataLoader implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) throws Exception {
-        reviewRepository.saveAll(reviewProducer.produce(10));
-        memberRepository.save(memberProducer.produce());
+        Member member = memberProducer.produce();
+        Member savedMember = memberRepository.save(member);
+        reviewRepository.saveAll(reviewProducer.produce(savedMember, 10));
     }
 }

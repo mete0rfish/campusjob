@@ -11,6 +11,7 @@ import java.util.List;
 public class ReviewResponse {
 
     private Long id;
+    private Long authorId;
     private String company;
     private List<String> certificates;
     private Integer age;
@@ -20,6 +21,7 @@ public class ReviewResponse {
     public static ReviewResponse from(Review review) {
         return ReviewResponse.builder()
                 .id(review.getId())
+                .authorId(review.getMember().getId())
                 .company(review.getCompany())
                 .certificates(review.getCertificates())
                 .age(review.getAge())

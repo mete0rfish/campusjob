@@ -15,6 +15,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -58,6 +62,26 @@ class ReviewServiceTest {
     }
 
     @Nested
+    @DisplayName("리뷰 목록 조회")
+    class GetReviewsTest {
+        @Test
+        @DisplayName("성공")
+        void getReviews_success() {
+            // given
+            List<Review> reviewList = List.of(review);
+            Page<Review> reviewPage = new PageImpl<>(reviewList, PageRequest.of(0, 10), 1);
+            given(reviewRepository.findAllWithMember(any(Pageable.class))).willReturn(reviewPage);
+
+            // when
+            Page<ReviewResponse> response = reviewService.getReviews(PageRequest.of(0, 10));
+
+            // then
+            assertThat(response.getTotalElements()).isEqualTo(1);
+            assertThat(response.getContent().get(0).getAuthorId()).isEqualTo(member.getId());
+        }
+    }
+
+    @Nested
     @DisplayName("리뷰 생성")
     class CreateReviewTest {
         @Test
@@ -79,6 +103,7 @@ class ReviewServiceTest {
 
             // then
             assertThat(response.getId()).isEqualTo(review.getId());
+            assertThat(response.getAuthorId()).isEqualTo(member.getId());
             assertThat(response.getCompany()).isEqualTo(review.getCompany());
             assertThat(response.getCertificates()).isEqualTo(request.getCertificates());
             verify(reviewRepository, times(1)).save(any(Review.class));
@@ -112,6 +137,7 @@ class ReviewServiceTest {
 
             // then
             assertThat(response.getId()).isEqualTo(review.getId());
+            assertThat(response.getAuthorId()).isEqualTo(member.getId());
         }
 
         @Test

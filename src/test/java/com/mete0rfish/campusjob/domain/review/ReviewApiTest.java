@@ -63,6 +63,7 @@ class ReviewApiTest {
     void setUp() {
         reviewResponse = ReviewResponse.builder()
                 .id(1L)
+                .authorId(1L)
                 .company("Test Company")
                 .certificates(List.of("cert1"))
                 .age(25)
@@ -95,6 +96,7 @@ class ReviewApiTest {
                             .param("size", "10"))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.content[0].id").value(reviewResponse.getId()))
+                    .andExpect(jsonPath("$.content[0].authorId").value(reviewResponse.getAuthorId()))
                     .andExpect(jsonPath("$.totalElements").value(1));
         }
     }
@@ -122,7 +124,8 @@ class ReviewApiTest {
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isCreated())
                     .andExpect(header().string("Location", "/reviews/" + reviewResponse.getId()))
-                    .andExpect(jsonPath("$.id").value(reviewResponse.getId()));
+                    .andExpect(jsonPath("$.id").value(reviewResponse.getId()))
+                    .andExpect(jsonPath("$.authorId").value(reviewResponse.getAuthorId()));
         }
     }
 
@@ -141,6 +144,7 @@ class ReviewApiTest {
                             .header("Authorization", "Bearer " + token))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.id").value(reviewResponse.getId()))
+                    .andExpect(jsonPath("$.authorId").value(reviewResponse.getAuthorId()))
                     .andExpect(jsonPath("$.tip").value(reviewResponse.getTip()));
         }
 

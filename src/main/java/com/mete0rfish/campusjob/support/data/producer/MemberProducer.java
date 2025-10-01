@@ -19,13 +19,11 @@ public class MemberProducer {
     private final PasswordEncoder passwordEncoder;
 
     public Member produce() {
-        FixtureMonkey fixtureMonkey = FixtureMonkey.create();
-        return fixtureMonkey.giveMeBuilder(Member.class)
-                    .setNull("id")
-                    .set("email", "sungwon326@naver.com")
-                    .set("name", "윤성원")
-                    .set("password", passwordEncoder.encode("1254mlm"))
-                    .set("role", MemberRole.USER)
-                    .sample();
+        return Member.builder()
+                .email("sungwon326@naver.com")
+                .name("윤성원")
+                .role(MemberRole.USER)
+                .password(passwordEncoder.encode("1254mlm"))
+                .build();
     }
 }

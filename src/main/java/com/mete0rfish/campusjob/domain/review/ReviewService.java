@@ -22,7 +22,7 @@ public class ReviewService {
 
     @Transactional(readOnly = true)
     public Page<ReviewResponse> getReviews(Pageable pageable) {
-        return reviewRepository.findAll(pageable)
+        return reviewRepository.findAllWithMember(pageable)
                 .map(ReviewResponse::from);
     }
 
