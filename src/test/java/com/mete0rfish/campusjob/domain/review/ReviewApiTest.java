@@ -211,30 +211,45 @@ class ReviewApiTest {
     class DeleteReviewApiTest {
         @Test
         @DisplayName("성공")
+        @WithMockUser(username = "test@test.com", roles = "USER")
         void deleteReview_success() throws Exception {
             // given
             Long reviewId = 1L;
-            doNothing().when(reviewService).deleteReview(reviewId);
+            doNothing().when(reviewService).deleteReview(eq("test@test.com"), eq(reviewId));
 
             // when & then
-            mockMvc.perform(delete("/api/reviews/{reviewId}", reviewId)
-                            .header("Authorization", "Bearer " + token))
+            mockMvc.perform(delete("/api/reviews/{reviewId}", reviewId))
                     .andExpect(status().isNoContent());
         }
 
         @Test
         @DisplayName("실패 - 존재하지 않는 리뷰")
+        @WithMockUser(username = "test@test.com", roles = "USER")
         void deleteReview_fail_reviewNotFound() throws Exception {
             // given
             Long reviewId = 999L;
-            doThrow(new CustomException(ErrorCode.REVIEW_NOT_FOUND)).when(reviewService).deleteReview(reviewId);
+            doThrow(new CustomException(ErrorCode.REVIEW_NOT_FOUND))
+                    .when(reviewService).deleteReview(eq("test@test.com"), eq(reviewId));
 
             // when & then
-            mockMvc.perform(delete("/api/reviews/{reviewId}", reviewId)
-                            .header("Authorization", "Bearer " + token))
+            mockMvc.perform(delete("/api/reviews/{reviewId}", reviewId))
                     .andExpect(status().isNotFound())
-                    .andDo(print())
                     .andExpect(jsonPath("$.code").value(ErrorCode.REVIEW_NOT_FOUND.getCode()));
+        }
+
+        @Test
+        @DisplayName("실패 - 권한 없음")
+        @WithMockUser(username = "other@test.com", roles = "USER")
+        void deleteReview_fail_forbidden() throws Exception {
+            // given
+            Long reviewId = 1L;
+            doThrow(new CustomException(ErrorCode.FORBIDDEN))
+                    .when(reviewService).deleteReview(eq("other@test.com"), eq(reviewId));
+
+            // when & then
+            mockMvc.perform(delete("/api/reviews/{reviewId}", reviewId))
+                    .andExpect(status().isForbidden())
+                    .andExpect(jsonPath("$.code").value(ErrorCode.FORBIDDEN.getCode()));
         }
     }
 }

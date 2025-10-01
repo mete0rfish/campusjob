@@ -23,8 +23,10 @@ public class TestDataLoader implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) throws Exception {
-        Member member = memberProducer.produce();
-        Member savedMember = memberRepository.save(member);
+        Member member = memberProducer.produceMe();
+        Member userMember = memberProducer.produceUser("noway@gmail.com", "홍길동", "1234qwer");
+        Member savedMember = memberRepository.save(userMember);
+        memberRepository.save(member);
         reviewRepository.saveAll(reviewProducer.produce(savedMember, 10));
     }
 }

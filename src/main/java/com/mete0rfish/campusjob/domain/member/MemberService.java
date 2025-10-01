@@ -18,6 +18,13 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
+    @Transactional(readOnly = true)
+    public MemberResponse getMemberByEmail(String email) {
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+        return MemberResponse.from(member);
+    }
+
     @Transactional
     public MemberResponse createMember(CreateMemberRequest request) {
         if (memberRepository.findByEmail(request.getEmail()).isPresent()) {

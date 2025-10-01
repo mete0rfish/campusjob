@@ -54,9 +54,10 @@ public class ReviewApi {
     }
 
     @DeleteMapping("/{reviewId}")
-    public ResponseEntity<Void> deleteReview(@PathVariable Long reviewId) {
-        // TODO: Add authorization check to ensure the user can delete this review
-        reviewService.deleteReview(reviewId);
+    public ResponseEntity<Void> deleteReview(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long reviewId) {
+        reviewService.deleteReview(userDetails.getUsername(), reviewId);
         return ResponseEntity.noContent().build();
     }
 }

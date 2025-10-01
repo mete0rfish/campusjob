@@ -21,6 +21,7 @@ public enum ErrorCode {
 
     // Common
     INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "COMMON_001", "잘못된 입력 값입니다."),
+    FORBIDDEN(HttpStatus.FORBIDDEN, "COMMON_002", "권한이 없습니다."),
     ;
 
     private final HttpStatus status;

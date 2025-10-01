@@ -64,11 +64,13 @@ public class ReviewService {
     }
 
     @Transactional
-    public void deleteReview(Long reviewId) {
+    public void deleteReview(String userEmail, Long reviewId) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new CustomException(ErrorCode.REVIEW_NOT_FOUND));
 
-        // TODO: Add authorization check here
+        if (!review.getMember().getEmail().equals(userEmail)) {
+            throw new CustomException(ErrorCode.FORBIDDEN);
+        }
 
         reviewRepository.delete(review);
     }

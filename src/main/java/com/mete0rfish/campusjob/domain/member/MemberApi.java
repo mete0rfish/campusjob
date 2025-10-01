@@ -5,6 +5,8 @@ import com.mete0rfish.campusjob.domain.member.dto.MemberResponse;
 import com.mete0rfish.campusjob.domain.member.dto.UpdateMemberRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -15,6 +17,12 @@ import java.net.URI;
 public class MemberApi {
 
     private final MemberService memberService;
+
+    @GetMapping("/me")
+    public ResponseEntity<MemberResponse> getMe(@AuthenticationPrincipal UserDetails userDetails) {
+        MemberResponse response = memberService.getMemberByEmail(userDetails.getUsername());
+        return ResponseEntity.ok(response);
+    }
 
     @PostMapping
     public ResponseEntity<MemberResponse> createMember(@RequestBody CreateMemberRequest request) {

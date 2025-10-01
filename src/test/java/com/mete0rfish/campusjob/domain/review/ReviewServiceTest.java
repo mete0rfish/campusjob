@@ -204,7 +204,7 @@ class ReviewServiceTest {
             given(reviewRepository.findById(review.getId())).willReturn(Optional.of(review));
 
             // when
-            reviewService.deleteReview(review.getId());
+            reviewService.deleteReview(member.getEmail(), review.getId());
 
             // then
             verify(reviewRepository, times(1)).delete(review);
@@ -218,9 +218,22 @@ class ReviewServiceTest {
             given(reviewRepository.findById(reviewId)).willReturn(Optional.empty());
 
             // when & then
-            assertThatThrownBy(() -> reviewService.deleteReview(reviewId))
+            assertThatThrownBy(() -> reviewService.deleteReview(member.getEmail(), reviewId))
                     .isInstanceOf(CustomException.class)
                     .hasFieldOrPropertyWithValue("errorCode", ErrorCode.REVIEW_NOT_FOUND);
+        }
+
+        @Test
+        @DisplayName("실패 - 권한 없음")
+        void deleteReview_fail_forbidden() {
+            // given
+            given(reviewRepository.findById(review.getId())).willReturn(Optional.of(review));
+            String otherUserEmail = "other@test.com";
+
+            // when & then
+            assertThatThrownBy(() -> reviewService.deleteReview(otherUserEmail, review.getId()))
+                    .isInstanceOf(CustomException.class)
+                    .hasFieldOrPropertyWithValue("errorCode", ErrorCode.FORBIDDEN);
         }
     }
 }
