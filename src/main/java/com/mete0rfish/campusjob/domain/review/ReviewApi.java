@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 
+// TODO API URL이 프론트랑 다름
 @RestController
 @RequestMapping("/api/reviews")
 @RequiredArgsConstructor

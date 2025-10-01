@@ -8,10 +8,12 @@ import com.mete0rfish.campusjob.support.exception.ErrorCode;
 import com.mete0rfish.campusjob.support.member.MemberRole;
 import com.mete0rfish.campusjob.support.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MemberLoginService {
@@ -28,17 +30,10 @@ public class MemberLoginService {
                 passwordEncoder.encode(request.password()),
                 MemberRole.USER
         );
+        log.info("MemberLoginService: createMember: {}", member);
         memberRepository.save(member);
         return MemberResponse.from(member);
     }
 
-    public String login(LoginRequest request) {
-        Member member = memberRepository.findByEmail(request.email())
-                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
-        if(!passwordEncoder.matches(request.password(), member.getPassword())) {
-            // TODO 커스텀 예외처리
-            throw new RuntimeException("비밀번호가 일치하지 않습니다.");
-        }
-        return jwtUtil.createJwt(member.getEmail(), member.getRole().name());
-    }
+    
 }

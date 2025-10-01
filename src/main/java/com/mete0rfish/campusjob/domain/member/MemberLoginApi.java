@@ -22,10 +22,5 @@ public class MemberLoginApi {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/api/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequest request, HttpServletResponse servletResponse) {
-        final String token = memberLoginService.login(request);
-        servletResponse.addHeader("Authorization", "Bearer " + token);
-        return ResponseEntity.ok().build();
-    }
+    
 }
