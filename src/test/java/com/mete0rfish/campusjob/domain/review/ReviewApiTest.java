@@ -1,4 +1,3 @@
-
 package com.mete0rfish.campusjob.domain.review;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,6 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import com.mete0rfish.campusjob.support.config.SecurityConfig;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -60,6 +63,7 @@ class ReviewApiTest {
     void setUp() {
         reviewResponse = ReviewResponse.builder()
                 .id(1L)
+                .company("Test Company")
                 .certificates(List.of("cert1"))
                 .age(25)
                 .seekPeriod("3 months")
@@ -73,6 +77,29 @@ class ReviewApiTest {
     }
 
     @Nested
+    @DisplayName("리뷰 목록 조회 API")
+    class GetReviewsApiTest {
+        @Test
+        @DisplayName("성공")
+        void getReviews_success() throws Exception {
+            // given
+            List<ReviewResponse> reviewList = List.of(reviewResponse);
+            Page<ReviewResponse> reviewPage = new PageImpl<>(reviewList, PageRequest.of(0, 10), 1);
+
+            given(reviewService.getReviews(any(Pageable.class))).willReturn(reviewPage);
+
+            // when & then
+            mockMvc.perform(get("/api/reviews")
+                            .header("Authorization", "Bearer " + token)
+                            .param("page", "0")
+                            .param("size", "10"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.content[0].id").value(reviewResponse.getId()))
+                    .andExpect(jsonPath("$.totalElements").value(1));
+        }
+    }
+
+    @Nested
     @DisplayName("리뷰 생성 API")
     class CreateReviewApiTest {
         @Test
@@ -80,7 +107,7 @@ class ReviewApiTest {
         void createReview_success() throws Exception {
             // given
             CreateReviewRequest request = new CreateReviewRequest();
-            request.setCompanyId(1L);
+            request.setCompany("Test Company");
             request.setCertificates(List.of("cert1"));
             request.setAge(25);
             request.setSeekPeriod("3 months");
@@ -94,7 +121,7 @@ class ReviewApiTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isCreated())
-                    .andExpect(header().string("Location", "/api/reviews/" + reviewResponse.getId()))
+                    .andExpect(header().string("Location", "/reviews/" + reviewResponse.getId()))
                     .andExpect(jsonPath("$.id").value(reviewResponse.getId()));
         }
     }

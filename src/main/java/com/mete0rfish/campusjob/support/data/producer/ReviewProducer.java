@@ -8,6 +8,7 @@ import com.mete0rfish.campusjob.support.member.MemberRole;
 import com.navercorp.fixturemonkey.FixtureMonkey;
 import lombok.extern.slf4j.Slf4j;
 import net.jqwik.api.Arbitraries;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -16,9 +17,10 @@ import java.util.List;
 import java.util.Locale;
 
 @Slf4j
+@Component
 public class ReviewProducer {
 
-    public static List<Review> produce(final int count) {
+    public List<Review> produce(final int count) {
         final List<Review> reviews = new ArrayList<>();
         FixtureMonkey fixtureMonkey = FixtureMonkey.create();
         for(int i=0;i<count;i++) {

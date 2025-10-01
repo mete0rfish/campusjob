@@ -11,6 +11,7 @@ import java.util.List;
 public class ReviewResponse {
 
     private Long id;
+    private String company;
     private List<String> certificates;
     private Integer age;
     private String seekPeriod;
@@ -19,6 +20,7 @@ public class ReviewResponse {
     public static ReviewResponse from(Review review) {
         return ReviewResponse.builder()
                 .id(review.getId())
+                .company(review.getCompany())
                 .certificates(review.getCertificates())
                 .age(review.getAge())
                 .seekPeriod(review.getSeekPeriod())

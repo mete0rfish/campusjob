@@ -1,8 +1,5 @@
-
 package com.mete0rfish.campusjob.domain.review;
 
-import com.mete0rfish.campusjob.domain.company.Company;
-import com.mete0rfish.campusjob.domain.company.CompanyRepository;
 import com.mete0rfish.campusjob.domain.member.Member;
 import com.mete0rfish.campusjob.domain.member.MemberRepository;
 import com.mete0rfish.campusjob.domain.review.dto.CreateReviewRequest;
@@ -41,17 +38,14 @@ class ReviewServiceTest {
     @Mock
     private MemberRepository memberRepository;
 
-    @Mock
-    private CompanyRepository companyRepository;
-
     private Member member;
-    private Company company;
     private Review review;
+    private String company;
 
     @BeforeEach
     void setUp() {
         member = Member.builder().id(1L).email("test@test.com").build();
-        company = Company.builder().id(1L).companyName("Test Company").build();
+        company = "Test Company";
         review = Review.builder()
                 .id(1L)
                 .member(member)
@@ -71,14 +65,13 @@ class ReviewServiceTest {
         void createReview_success() {
             // given
             CreateReviewRequest request = new CreateReviewRequest();
-            request.setCompanyId(company.getId());
+            request.setCompany(company);
             request.setCertificates(List.of("cert1"));
             request.setAge(25);
             request.setSeekPeriod("3 months");
             request.setTip("Good tip");
 
             given(memberRepository.findByEmail(member.getEmail())).willReturn(Optional.of(member));
-            given(companyRepository.findById(company.getId())).willReturn(Optional.of(company));
             given(reviewRepository.save(any(Review.class))).willReturn(review);
 
             // when
@@ -86,6 +79,7 @@ class ReviewServiceTest {
 
             // then
             assertThat(response.getId()).isEqualTo(review.getId());
+            assertThat(response.getCompany()).isEqualTo(review.getCompany());
             assertThat(response.getCertificates()).isEqualTo(request.getCertificates());
             verify(reviewRepository, times(1)).save(any(Review.class));
         }
@@ -101,21 +95,6 @@ class ReviewServiceTest {
             assertThatThrownBy(() -> reviewService.createReview("nonexistent@test.com", request))
                     .isInstanceOf(CustomException.class)
                     .hasFieldOrPropertyWithValue("errorCode", ErrorCode.MEMBER_NOT_FOUND);
-        }
-
-        @Test
-        @DisplayName("실패 - 존재하지 않는 회사")
-        void createReview_fail_companyNotFound() {
-            // given
-            CreateReviewRequest request = new CreateReviewRequest();
-            request.setCompanyId(999L);
-            given(memberRepository.findByEmail(member.getEmail())).willReturn(Optional.of(member));
-            given(companyRepository.findById(request.getCompanyId())).willReturn(Optional.empty());
-
-            // when & then
-            assertThatThrownBy(() -> reviewService.createReview(member.getEmail(), request))
-                    .isInstanceOf(CustomException.class)
-                    .hasFieldOrPropertyWithValue("errorCode", ErrorCode.COMPANY_NOT_FOUND);
         }
     }
 

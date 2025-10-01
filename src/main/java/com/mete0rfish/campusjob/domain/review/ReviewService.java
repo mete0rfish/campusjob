@@ -1,7 +1,5 @@
 package com.mete0rfish.campusjob.domain.review;
 
-import com.mete0rfish.campusjob.domain.company.Company;
-import com.mete0rfish.campusjob.domain.company.CompanyRepository;
 import com.mete0rfish.campusjob.domain.member.Member;
 import com.mete0rfish.campusjob.domain.member.MemberRepository;
 import com.mete0rfish.campusjob.domain.review.dto.CreateReviewRequest;
@@ -10,6 +8,8 @@ import com.mete0rfish.campusjob.domain.review.dto.UpdateReviewRequest;
 import com.mete0rfish.campusjob.support.exception.CustomException;
 import com.mete0rfish.campusjob.support.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,19 +19,21 @@ public class ReviewService {
 
     private final ReviewRepository reviewRepository;
     private final MemberRepository memberRepository;
-    private final CompanyRepository companyRepository;
+
+    @Transactional(readOnly = true)
+    public Page<ReviewResponse> getReviews(Pageable pageable) {
+        return reviewRepository.findAll(pageable)
+                .map(ReviewResponse::from);
+    }
 
     @Transactional
     public ReviewResponse createReview(String userEmail, CreateReviewRequest request) {
         Member member = memberRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
-        Company company = companyRepository.findById(request.getCompanyId())
-                .orElseThrow(() -> new CustomException(ErrorCode.COMPANY_NOT_FOUND));
-
         Review review = Review.builder()
                 .member(member)
-                .company(company)
+                .company(request.getCompany())
                 .certificates(request.getCertificates())
                 .age(request.getAge())
                 .seekPeriod(request.getSeekPeriod())

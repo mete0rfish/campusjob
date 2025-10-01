@@ -1,6 +1,5 @@
 package com.mete0rfish.campusjob.domain.review;
 
-import com.mete0rfish.campusjob.domain.company.Company;
 import com.mete0rfish.campusjob.domain.member.Member;
 import com.mete0rfish.campusjob.support.converter.StringListConverter;
 import jakarta.persistence.*;
@@ -15,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "review")
-@ToString(exclude = {"member", "company"})
+@ToString(exclude = {"member"})
 public class Review {
 
     @Id
@@ -29,9 +28,7 @@ public class Review {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @OneToOne
-    @JoinColumn(name = "company_id")
-    private Company company;
+    private String company;
 
     @Convert(converter = StringListConverter.class)
     private List<String> certificates;

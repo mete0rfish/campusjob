@@ -8,7 +8,7 @@ import java.util.List;
 @Getter
 @Setter
 public class CreateReviewRequest {
-    private Long companyId;
+    private String company;
     private List<String> certificates;
     private Integer age;
     private String seekPeriod;
